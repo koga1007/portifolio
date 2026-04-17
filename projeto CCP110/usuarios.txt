@@ -1,0 +1,4 @@
+ usuario: koga - senha: koga1 
+ usuario: tuga - senha: tuga1 
+ usuario: kiara - senha: kiara1 
+ usuario: lais - senha: lais1 

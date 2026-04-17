@@ -1,0 +1,316 @@
+def carregar_usuarios ():
+
+    usuarios = []
+
+    senhas = []
+
+    try:
+
+        with open ("usuarios.txt", "r") as arquivo:
+
+            for i in arquivo:
+                i = i.strip()
+
+                if "-" in i:
+
+                    partes = i.split("-")
+
+                    usuario_limpo = partes[0].split(":")
+                    senha_limpo = partes[1].split(":")
+
+                    usuario_final = usuario_limpo[1].strip()
+                    senha_final = senha_limpo[1].strip()
+
+                    usuarios.append(usuario_final)
+
+                    senhas.append(senha_final)
+
+    except FileNotFoundError:
+        pass
+    return usuarios, senhas
+
+def salvar_usuarios(usuarios, senhas):
+    with open ("usuarios.txt", "w") as arquivo:
+
+        for i in range (len(usuarios)):
+
+            arquivo.write(" usuario: %s - senha: %s \n" %(usuarios[i], senhas[i]))
+
+def salvar_videos(videos):
+
+    with open("videos.txt", "w") as arquivo:
+
+        for i in range (len(videos)):
+            arquivo.write("nome do video: %s\n" %videos[i])
+
+def carregar_videos():
+    
+    videos = []
+    try:
+
+        with open ("videos.txt", "r") as arquivo:
+
+            for i in arquivo:
+                partes = i.split(":")
+                if ":" in i:
+                    partes = i.split(":")
+                    videos.append(partes[1].strip())
+
+    except FileNotFoundError:
+        pass
+
+    return videos
+
+def salvar_lista_Reproducao (lista_reproducao):
+
+    with open ("ListaDeReprodução.txt", "w") as arquivo:
+
+        for i in range (len(lista_reproducao)):
+
+            arquivo.write("%d video:%s\n" % (i + 1, lista_reproducao[i]))
+
+def carregar_lista_reproducao():
+
+    lista_reproducao = []
+
+    try:
+
+        with open ("ListaDeReprodução.txt", "r") as arquivo:
+
+            for i in arquivo:
+
+                if ":" in i:
+                
+                    partes = i.split(":")
+
+                    lista_reproducao.append(partes[1].strip())
+
+    except FileNotFoundError:
+        pass
+    return lista_reproducao
+
+
+def salvar_avaliacoes (avaliacoes, videos):
+
+
+    with open("avaliacoes.txt", "w") as arquivo:
+        for i in range(len(videos)):
+             arquivo.write("%s:%d\n" %(videos[i],avaliacoes[i]))
+
+
+def carregar_avaliacoes(videos):
+    avaliacoes = [0]* len(videos)
+    try:
+        with open("avaliacoes.txt", "r") as arquivo:
+            for i in arquivo:
+                if ":" in i:
+                    partes = i.strip().split(":") 
+                    nome_video = partes[0].strip()
+                    avaliacao_video = int(partes[1].strip())
+
+                    if nome_video in videos:
+                        indice = videos.index(nome_video)
+                        avaliacoes[indice] = avaliacao_video
+    except FileNotFoundError:
+        pass    
+    return avaliacoes
+
+            
+usuarios, senhas = carregar_usuarios()
+
+videos = carregar_videos()
+
+lista_reproducao = carregar_lista_reproducao()
+
+notas = carregar_avaliacoes(videos)
+
+while (1):
+
+    escolha = int(input("Digite o numero da opcao desejada:\n1 - Fazer cadastro\n2 - Fazer login\n3 - Login de ADM \nEscolha:"))
+
+    senha_ADM = "ADM15"
+
+    escolha_login = 0
+
+    login_ADM = False
+
+    login_realizado = False
+
+    if escolha == 1:
+
+        nome_usuario = str(input("Crie o seu nome de usuario:"))
+
+        nome_existente = False
+
+        for i in usuarios:
+            if i == nome_usuario:
+                nome_existente = True
+                break
+
+        if nome_existente:
+            print("\nNome de usuario ja existente\n")
+
+        else:
+
+            usuarios.append(nome_usuario)
+
+            senha_usuario = str(input("Crie a sua senha:"))
+            senhas.append(senha_usuario)
+
+            salvar_usuarios(usuarios, senhas)
+
+            print("\nUsuario criado com sucesso\n")
+
+    elif escolha == 3:
+        senha_digitada = str(input("Digite a senha para ADMs:"))
+
+        if senha_digitada == senha_ADM:
+            print("\nBem vindo ADM\n")
+            login_ADM = True
+
+        else:
+            print("\nSenha incorreta\n")
+
+        if login_ADM == True:
+
+            escolha_ADM = int(input("Digite o numero da opcao desejada:\n1 - Cadastrar video \n2 - Excluir videos \n3 - Consultar Usuarios \n4 - Estatísticas\nEscolha:"))
+
+            if escolha_ADM == 1:
+
+                print("\n%s\n" %videos)
+
+                nome_video = str(input("Digite o nome do video:"))
+
+                videos.append(nome_video)
+                notas.append(0)
+                salvar_videos(videos)
+                salvar_avaliacoes(notas, videos)
+                print("\nVideo cadastrado\n")
+
+
+            elif escolha_ADM == 2:
+
+                print("\n%s\n" %videos)
+                video_excluir = str(input("Digite o nome do video a ser excluido: "))
+
+                if video_excluir in videos:
+
+                    indice_video = videos.index(video_excluir)
+
+                    videos.pop(indice_video)
+                    notas.pop(indice_video)
+                    salvar_videos(videos)
+                    salvar_avaliacoes(notas, videos)
+
+                    print("\nVideo excluido\n")
+
+                else:
+                    print("\nvideo nao encontrado\n")
+
+            elif escolha_ADM == 3:
+                print("\n%s\n" %usuarios)
+
+            elif escolha_ADM == 4:
+
+                print("\nQuantidade de usuarios: %d" % len(usuarios))
+                print("Quantidade de videos: %d\n" % len(videos))
+
+                for i in range(len(videos)):
+                    print("%s: %d pontos" % (videos[i], notas[i]))
+
+    elif escolha == 2:
+        
+        usuario_login = str(input("Digite o seu usuario:"))
+        for i in usuarios:
+            if i == usuario_login:
+                indice = usuarios.index(usuario_login)
+
+                senha_login = str(input("Digite a sua senha:"))
+
+                if senhas[indice] == senha_login:
+                    print("\nBem vindo %s\n" % usuario_login)
+                    login_realizado = True
+                else:
+                    print("\nUsuario nao encontrado\n")
+                break
+
+    if login_realizado == True:
+
+        escolha_login = int(input("1 - Buscar videos\n2 - Avaliar videos\n3 - Gerenciar favoritos\nEscolha:"))
+
+        if escolha_login == 1:
+
+            print(videos)
+
+            Buscar_video = str(input("Nome do video:"))
+            video_encontrado = False
+
+            for i in videos:
+                if i == Buscar_video:
+                    video_encontrado = True
+                    break
+            
+            if video_encontrado == True:
+                print("\nVídeo encontrado!\n")
+                indice_video = videos.index(Buscar_video)
+                    
+            else:
+                print("\nVídeo não encontrado.\n")
+
+        if escolha_login == 2:
+            print("\nVídeos: %s" % videos)
+            video_avaliar = str(input("Nome do vídeo para avaliar: "))
+
+            if video_avaliar in videos:
+                indice = videos.index(video_avaliar)
+                nota = int(input("1 para LIKE | 0 para DESLIKE: "))
+
+                if nota == 1:
+                    notas[indice] += 1
+                    print("Like registrado!")
+                elif nota == 0:
+                    notas[indice] -= 1
+                    print("Deslike registrado!")
+                
+                salvar_avaliacoes(notas, videos)
+            else:
+                print("Vídeo não encontrado.")
+
+
+        if escolha_login == 3:
+
+            escolha_reproducao = int(input("1 - Add video a lista de reproducao\n2 - Remover video da lista de reproducao\nEscolha:"))
+            
+            if escolha_reproducao == 1:
+
+                add_video = str(input("Digite o nome do video a ser adicionado a fila de reproducao: "))
+
+                if add_video in videos:
+
+                    lista_reproducao.append(add_video)
+
+                    salvar_lista_Reproducao(lista_reproducao)
+
+                    print("\nVideo adicionado com sucesso\n")
+
+                else:
+                    print("\nEste video nao existe no sistema\n")
+
+            elif escolha_reproducao == 2:
+
+                excluir_video = str(input("Digite o nome do video a ser excluido da lista de reprodução: "))
+
+                if excluir_video in lista_reproducao:
+
+                    indice_lista_reproducao = lista_reproducao.index(excluir_video)
+
+                    lista_reproducao.pop(indice_lista_reproducao)
+                    salvar_lista_Reproducao(lista_reproducao)
+
+                    print("\nVideo excluido\n")
+
+                else:
+                    print("\nvideo nao encontrado\n")
+
+
+
